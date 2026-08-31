@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#15100E">
+<title>Where is Rohit?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ebony: #15100E;
+    --board: #1F1815;
+    --edge: #33272192;
+    --spruce: #F3ECE4;
+    --muted: #A6968A;
+    --brass: #C9A227;
+    --sage: #7C9A7E;
+    --strike: #E0533D;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--ebony);
+    color: var(--spruce);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 26px 20px 44px; }
+
+  .eyebrow {
+    font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 14px;
+  }
+  .hero { margin: 0 0 6px; }
+  .hero h1 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600; font-size: clamp(30px, 9vw, 42px);
+    line-height: 1.06; margin: 0 0 10px; letter-spacing: -0.01em;
+  }
+  .hero .sub { color: var(--muted); font-size: 15px; margin: 0; }
+  .hero .sub strong { color: var(--spruce); font-weight: 500; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; }
+  .chip {
+    font-size: 13px; padding: 7px 12px; border-radius: 999px;
+    border: 1px solid var(--edge); background: var(--board); color: var(--spruce);
+    text-decoration: none; display: inline-flex; align-items: center; gap: 7px;
+  }
+  .chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brass); }
+  .chip.live .dot { background: var(--strike); }
+  .chip.free .dot { background: var(--sage); }
+  .chip.call { border-color: #4a3a2e; }
+
+  h2.section {
+    font-family: "Fraunces", Georgia, serif; font-weight: 400;
+    font-size: 15px; letter-spacing: .02em; color: var(--muted);
+    margin: 34px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--edge);
+  }
+
+  /* The day rail: a fretboard of the working day, proportional to real time. */
+  .rail { position: relative; margin-top: 4px; }
+  .rail .track {
+    position: absolute; left: 54px; top: 0; bottom: 0; width: 2px;
+    background: linear-gradient(180deg, #2b211c, #3a2c24 50%, #2b211c);
+    border-radius: 2px;
+  }
+  .rail .block {
+    position: absolute; left: 54px; right: 0;
+    padding-left: 16px; display: flex; align-items: center;
+  }
+  .rail .block .body {
+    width: 100%; background: var(--board); border: 1px solid var(--edge);
+    border-left: 3px solid var(--brass); border-radius: 10px;
+    padding: 9px 12px; min-height: 46px;
+  }
+  .rail .block.now .body { border-left-color: var(--strike); background: #241a16; }
+  .rail .block .k { font-size: 14px; font-weight: 500; }
+  .rail .block .p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .rail .stamp {
+    position: absolute; left: 0; width: 48px; text-align: right;
+    font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums;
+  }
+  .rail .nowline {
+    position: absolute; left: 34px; right: 0; height: 1px; background: var(--strike);
+  }
+  .rail .nowline::before {
+    content: ""; position: absolute; left: 18px; top: -3px;
+    width: 7px; height: 7px; border-radius: 50%; background: var(--strike);
+  }
+  .rail .nowline span {
+    position: absolute; left: 0; top: -7px; font-size: 10px; color: var(--strike);
+    letter-spacing: .08em; text-transform: uppercase; background: var(--ebony); padding-right: 4px;
+  }
+
+  .empty {
+    border: 1px dashed var(--edge); border-radius: var(--radius);
+    padding: 20px; color: var(--muted); font-size: 14px; text-align: center;
+  }
+
+  .week { display: grid; gap: 8px; }
+  .row {
+    display: grid; grid-template-columns: 78px 1fr auto; align-items: center; gap: 10px;
+    background: var(--board); border: 1px solid var(--edge);
+    border-radius: 10px; padding: 11px 13px;
+  }
+  .row .d { font-size: 13px; font-weight: 500; }
+  .row .t { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .row .n { font-size: 12px; color: var(--brass); }
+  .row.off .n { color: var(--sage); }
+
+  footer { margin-top: 30px; font-size: 12px; color: #6f6259; line-height: 1.6; }
+  footer .stale { color: var(--strike); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .chip.live .dot { animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Rohit's day</p>
+  <div class="hero">
+    <h1 id="headline">Loading</h1>
+    <p class="sub" id="subline"></p>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <h2 class="section" id="todayHeading">Today</h2>
+  <div id="today"></div>
+
+  <h2 class="section">Rest of the week</h2>
+  <div class="week" id="week"></div>
+
+  <footer>
+    <div id="freshness"></div>
+    <div>This page updates itself each morning. Times are Rohit's local times.</div>
+  </footer>
+</div>
+
+<script>
+const MODEL = {"name":"Rohit","phone":"+919654338350","freeNote":"not teaching","generatedAt":1788148708835,"generatedLabel":"Monday, 31 Aug, 9:28am","days":[{"index":0,"label":"Monday, 31 Aug","short":"Mon 31","dayStartMs":1788114600000,"dayEndMs":1788201000000,"events":[{"s":1788147900000,"e":1788150600000,"startLabel":"9:15am","endLabel":"10am","kind":"Zoom class","title":"Zoom class","place":"Online","note":"teaching on Zoom"},{"s":1788174000000,"e":1788176700000,"startLabel":"4:30pm","endLabel":"5:15pm","kind":"Zoom class","title":"Zoom class","place":"Online","note":"teaching on Zoom"}],"count":2,"firstLabel":"9:15am","lastLabel":"5:15pm","railStartMs":1788145200000,"railEndMs":1788179400000},{"index":1,"label":"Tuesday, 1 Sep","short":"Tue 1","dayStartMs":1788201000000,"dayEndMs":1788287400000,"events":[{"s":1788234300000,"e":1788237000000,"startLabel":"9:15am","endLabel":"10am","kind":"Zoom class","title":"Zoom class","place":"Online","note":"teaching on Zoom"},{"s":1788258600000,"e":1788261300000,"startLabel":"4pm","endLabel":"4:45pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788261300000,"e":1788264000000,"startLabel":"4:45pm","endLabel":"5:30pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788264000000,"e":1788266700000,"startLabel":"5:30pm","endLabel":"6:15pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788266700000,"e":1788269400000,"startLabel":"6:15pm","endLabel":"7pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788269400000,"e":1788272100000,"startLabel":"7pm","endLabel":"7:45pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788272100000,"e":1788274800000,"startLabel":"7:45pm","endLabel":"8:30pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"}],"count":7,"firstLabel":"9:15am","lastLabel":"8:30pm","railStartMs":1788231600000,"railEndMs":1788277500000},{"index":2,"label":"Wednesday, 2 Sep","short":"Wed 2","dayStartMs":1788287400000,"dayEndMs":1788373800000,"events":[],"count":0,"firstLabel":"","lastLabel":"","railStartMs":null,"railEndMs":null},{"index":3,"label":"Thursday, 3 Sep","short":"Thu 3","dayStartMs":1788373800000,"dayEndMs":1788460200000,"events":[],"count":0,"firstLabel":"","lastLabel":"","railStartMs":null,"railEndMs":null},{"index":4,"label":"Friday, 4 Sep","short":"Fri 4","dayStartMs":1788460200000,"dayEndMs":1788546600000,"events":[{"s":1788516900000,"e":1788519600000,"startLabel":"3:45pm","endLabel":"4:30pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788519600000,"e":1788522300000,"startLabel":"4:30pm","endLabel":"5:15pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788522300000,"e":1788525000000,"startLabel":"5:15pm","endLabel":"6pm","kind":"Zoom class","title":"Zoom class","place":"Online","note":"teaching on Zoom"},{"s":1788526800000,"e":1788529500000,"startLabel":"6:30pm","endLabel":"7:15pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788527700000,"e":1788530400000,"startLabel":"6:45pm","endLabel":"7:30pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788530400000,"e":1788533100000,"startLabel":"7:30pm","endLabel":"8:15pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"}],"count":6,"firstLabel":"3:45pm","lastLabel":"8:15pm","railStartMs":1788514200000,"railEndMs":1788535800000},{"index":5,"label":"Saturday, 5 Sep","short":"Sat 5","dayStartMs":1788546600000,"dayEndMs":1788633000000,"events":[{"s":1788586200000,"e":1788589800000,"startLabel":"11am","endLabel":"12pm","kind":"Group class","title":"Group class","place":"Class","note":"teaching"},{"s":1788595200000,"e":1788597900000,"startLabel":"1:30pm","endLabel":"2:15pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788600600000,"e":1788603300000,"startLabel":"3pm","endLabel":"3:45pm","kind":"Zoom class","title":"Zoom class","place":"Online","note":"teaching on Zoom"},{"s":1788602400000,"e":1788605100000,"startLabel":"3:30pm","endLabel":"4:15pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788605100000,"e":1788607800000,"startLabel":"4:15pm","endLabel":"5pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788607800000,"e":1788610500000,"startLabel":"5pm","endLabel":"5:45pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788607800000,"e":1788611400000,"startLabel":"5pm","endLabel":"6pm","kind":"Group class","title":"Group class","place":"Class","note":"teaching"},{"s":1788610500000,"e":1788613200000,"startLabel":"5:45pm","endLabel":"6:30pm","kind":"Zoom class","title":"Zoom class","place":"Online","note":"teaching on Zoom"},{"s":1788613200000,"e":1788615900000,"startLabel":"6:30pm","endLabel":"7:15pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788615900000,"e":1788618600000,"startLabel":"7:15pm","endLabel":"8pm","kind":"Zoom class","title":"Zoom class","place":"Online","note":"teaching on Zoom"}],"count":10,"firstLabel":"11am","lastLabel":"8pm","railStartMs":1788583500000,"railEndMs":1788621300000},{"index":6,"label":"Sunday, 6 Sep","short":"Sun 6","dayStartMs":1788633000000,"dayEndMs":1788719400000,"events":[{"s":1788669000000,"e":1788671700000,"startLabel":"10am","endLabel":"10:45am","kind":"Zoom class","title":"Zoom class","place":"Online","note":"teaching on Zoom"},{"s":1788671700000,"e":1788674400000,"startLabel":"10:45am","endLabel":"11:30am","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788677100000,"e":1788679800000,"startLabel":"12:15pm","endLabel":"1pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788679800000,"e":1788682500000,"startLabel":"1pm","endLabel":"1:45pm","kind":"Zoom class","title":"Zoom class","place":"Online","note":"teaching on Zoom"},{"s":1788679800000,"e":1788682500000,"startLabel":"1pm","endLabel":"1:45pm","kind":"Zoom class","title":"Zoom class","place":"Online","note":"teaching on Zoom"},{"s":1788679800000,"e":1788683400000,"startLabel":"1pm","endLabel":"2pm","kind":"Group class","title":"Group class","place":"Class","note":"teaching"},{"s":1788683400000,"e":1788686100000,"startLabel":"2pm","endLabel":"2:45pm","kind":"Zoom class","title":"Zoom class","place":"Online","note":"teaching on Zoom"},{"s":1788686100000,"e":1788688800000,"startLabel":"2:45pm","endLabel":"3:30pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788688800000,"e":1788691500000,"startLabel":"3:30pm","endLabel":"4:15pm","kind":"Zoom class","title":"Zoom class","place":"Online","note":"teaching on Zoom"},{"s":1788690600000,"e":1788694200000,"startLabel":"4pm","endLabel":"5pm","kind":"Zoom class","title":"Zoom class","place":"Online","note":"teaching on Zoom"},{"s":1788694200000,"e":1788696900000,"startLabel":"5pm","endLabel":"5:45pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788694200000,"e":1788696900000,"startLabel":"5pm","endLabel":"5:45pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"},{"s":1788699600000,"e":1788702300000,"startLabel":"6:30pm","endLabel":"7:15pm","kind":"Zoom class","title":"Zoom class","place":"Online","note":"teaching on Zoom"},{"s":1788699600000,"e":1788702300000,"startLabel":"6:30pm","endLabel":"7:15pm","kind":"Individual class","title":"Individual class","place":"Class","note":"teaching"}],"count":14,"firstLabel":"10am","lastLabel":"7:15pm","railStartMs":1788666300000,"railEndMs":1788705000000}]};
+const statusFor = function statusFor(events, nowMs) {
+  if (!events || events.length === 0) {
+    return { state: "off", current: null, next: null, untilMs: null };
+  }
+  let current = null;
+  let next = null;
+  for (let i = 0; i < events.length; i++) {
+    const ev = events[i];
+    if (nowMs >= ev.s && nowMs < ev.e) {
+      current = ev;
+      next = events[i + 1] || null;
+      break;
+    }
+    if (nowMs < ev.s) {
+      next = ev;
+      break;
+    }
+  }
+  if (current) {
+    return { state: "in", current: current, next: next, untilMs: current.e };
+  }
+  if (next) {
+    const first = events[0];
+    const state = nowMs < first.s ? "before" : "gap";
+    return { state: state, current: null, next: next, untilMs: next.s };
+  }
+  return { state: "done", current: null, next: null, untilMs: null };
+};
+const gapLabel = function gapLabel(ms) {
+  if (ms <= 0) return "now";
+  if (ms < 60000) return "under a minute";
+  const mins = Math.round(ms / 60000);
+  if (mins < 60) return mins + (mins === 1 ? " minute" : " minutes");
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (m === 0) return h + (h === 1 ? " hour" : " hours");
+  return h + "h " + m + "m";
+};
+
+function esc(s) {
+  return String(s).replace(/[&<>"]/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+  });
+}
+
+function todayIndex(nowMs) {
+  for (var i = 0; i < MODEL.days.length; i++) {
+    if (nowMs >= MODEL.days[i].dayStartMs && nowMs < MODEL.days[i].dayEndMs) return i;
+  }
+  return -1;
+}
+
+function renderHero(day, nowMs) {
+  var headline = document.getElementById("headline");
+  var subline = document.getElementById("subline");
+  var chips = document.getElementById("chips");
+  var name = MODEL.name;
+
+  if (!day) {
+    headline.textContent = name + "'s schedule is out of date";
+    subline.innerHTML = "This page was last updated on <strong>" + esc(MODEL.generatedLabel) + "</strong>.";
+    chips.innerHTML = "";
+    return;
+  }
+
+  var st = statusFor(day.events, nowMs);
+  var chipHTML = "";
+
+  if (st.state === "in") {
+    headline.textContent = name + " is in a class";
+    subline.innerHTML = esc(st.current.title) + " " + esc(st.current.note) +
+      ", free in <strong>" + gapLabel(st.current.e - nowMs) + "</strong>.";
+    chipHTML += '<span class="chip live"><span class="dot"></span>' + esc(st.current.place) +
+      " until " + esc(st.current.endLabel) + "</span>";
+    if (st.next) {
+      chipHTML += '<span class="chip"><span class="dot"></span>Next ' + esc(st.next.startLabel) + "</span>";
+    }
+  } else if (st.state === "before") {
+    headline.textContent = name + " starts at " + st.next.startLabel;
+    subline.innerHTML = "First class in <strong>" + gapLabel(st.next.s - nowMs) + "</strong>, " +
+      esc(st.next.note) + ".";
+    chipHTML += '<span class="chip free"><span class="dot"></span>Free right now</span>';
+    chipHTML += '<span class="chip"><span class="dot"></span>' + day.count + " classes today</span>";
+  } else if (st.state === "gap") {
+    headline.textContent = name + " is free";
+    subline.innerHTML = "Next class at <strong>" + esc(st.next.startLabel) + "</strong>, " +
+      esc(st.next.note) + ".";
+    chipHTML += '<span class="chip free"><span class="dot"></span>Free for ' +
+      gapLabel(st.next.s - nowMs) + "</span>";
+  } else if (st.state === "done") {
+    headline.textContent = name + " is done for the day";
+    subline.innerHTML = "Last class ended at <strong>" +
+      esc(day.events[day.events.length - 1].endLabel) + "</strong>.";
+    chipHTML += '<span class="chip free"><span class="dot"></span>No classes left</span>';
+  } else {
+    headline.textContent = name + " has no classes today";
+    subline.innerHTML = "Nothing on the teaching calendar for <strong>" + esc(day.label) + "</strong>.";
+    chipHTML += '<span class="chip free"><span class="dot"></span>Day off</span>';
+  }
+
+  if (MODEL.phone) {
+    chipHTML += '<a class="chip call" href="tel:' + esc(MODEL.phone) + '"><span class="dot"></span>Call ' + esc(name) + "</a>";
+  }
+  chips.innerHTML = chipHTML;
+}
+
+function renderRail(day, nowMs) {
+  var host = document.getElementById("today");
+  document.getElementById("todayHeading").textContent = day ? day.label : "Today";
+
+  if (!day || day.events.length === 0) {
+    host.innerHTML = '<div class="empty">No classes on the calendar for this day.</div>';
+    return;
+  }
+
+  var span = day.railEndMs - day.railStartMs;
+  var minutes = span / 60000;
+  var height = Math.max(260, Math.min(720, Math.round(minutes * 1.5)));
+  var html = '<div class="rail" style="height:' + height + 'px"><div class="track"></div>';
+
+  for (var i = 0; i < day.events.length; i++) {
+    var ev = day.events[i];
+    var top = ((ev.s - day.railStartMs) / span) * height;
+    var h = Math.max(46, ((ev.e - ev.s) / span) * height - 6);
+    var live = nowMs >= ev.s && nowMs < ev.e;
+    html += '<div class="stamp" style="top:' + (top + 2) + 'px">' + esc(ev.startLabel) + "</div>";
+    html += '<div class="block' + (live ? " now" : "") + '" style="top:' + top + "px;height:" + h + 'px">' +
+      '<div class="body"><div class="k">' + esc(ev.title) + "</div>" +
+      '<div class="p">' + esc(ev.place) + " &middot; " + esc(ev.startLabel) + " to " + esc(ev.endLabel) +
+      "</div></div></div>";
+  }
+
+  if (nowMs > day.railStartMs && nowMs < day.railEndMs) {
+    var ntop = ((nowMs - day.railStartMs) / span) * height;
+    html += '<div class="nowline" style="top:' + ntop + 'px"><span>now</span></div>';
+  }
+
+  html += "</div>";
+  host.innerHTML = html;
+}
+
+function renderWeek(startIndex) {
+  var host = document.getElementById("week");
+  var html = "";
+  for (var i = startIndex + 1; i < MODEL.days.length; i++) {
+    var d = MODEL.days[i];
+    html += '<div class="row' + (d.count ? "" : " off") + '">' +
+      '<div class="d">' + esc(d.short) + "</div>" +
+      '<div class="t">' + (d.count ? esc(d.firstLabel) + " to " + esc(d.lastLabel) : "Nothing scheduled") + "</div>" +
+      '<div class="n">' + (d.count ? d.count + (d.count === 1 ? " class" : " classes") : "Off") + "</div>" +
+      "</div>";
+  }
+  host.innerHTML = html || '<div class="empty">Nothing else on this week.</div>';
+}
+
+function renderFreshness(nowMs) {
+  var ageH = (nowMs - MODEL.generatedAt) / 3600000;
+  var el = document.getElementById("freshness");
+  if (ageH > 30) {
+    el.innerHTML = '<span class="stale">Last updated ' + esc(MODEL.generatedLabel) +
+      ", so this may be out of date.</span>";
+  } else {
+    el.textContent = "Last updated " + MODEL.generatedLabel + ".";
+  }
+}
+
+function draw() {
+  var now = Date.now();
+  var idx = todayIndex(now);
+  var day = idx === -1 ? null : MODEL.days[idx];
+  renderHero(day, now);
+  renderRail(day, now);
+  renderWeek(idx === -1 ? MODEL.days.length : idx);
+  renderFreshness(now);
+}
+
+draw();
+setInterval(draw, 30000);
+document.addEventListener("visibilitychange", function () {
+  if (!document.hidden) draw();
+});
+</script>
+</body>
+</html>
